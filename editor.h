@@ -69,7 +69,6 @@ namespace editor {
 	bool tag_set_path_display_flag (const std::string& label, bool);
 	bool tag_get_path_display_flag (const std::string& label);
 
-
 	struct MusicDefinition
 	{
 		enum class MusicDefinitionType { CUSTOM, STOCK, SILENCE } type;
@@ -80,15 +79,7 @@ namespace editor {
 		unsigned int duration_seconds;
 	};
 
-	struct StockMusic
-	{
-		std::string title;
-		std::string author;
-		std::string duration;
-	};
-
 	MusicDefinition get_music_definition();
-	std::vector<StockMusic> get_stock_music_list();
 	bool music_preview_play (const std::string& music_title);
 	bool music_preview_stop();
 	bool set_music_file (const std::string& music_path);

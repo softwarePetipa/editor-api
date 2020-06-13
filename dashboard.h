@@ -9,22 +9,13 @@ namespace petipa {
 namespace api {
 namespace dashboard {
 
-	bool login (const std::string& user_id, const std::string& password);
-	bool saml_login (const std::string& provider);
-	void logout();
-
-	std::string get_top_banner_content();
-	std::string get_bottom_banner_content();
 	bool is_bottom_banner_visible();
 	void hide_bottom_banner();
-	bool is_dark_mode_enabled();
-	void toggle_dark_mode();
 
 	struct ProjectListSection {
 		std::string label;
 		std::vector<std::string> project_names;
 	};
-
 	std::vector<ProjectListSection> get_project_list_sections();
 
 	bool open_new_project (void* system_context);
