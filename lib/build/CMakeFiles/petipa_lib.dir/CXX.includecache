@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../include/petipa/api/web.h
+string
+-
+vector
+-
+
+/Users/doti/petipa/api/mocklib/web.cpp
+string
+-
+vector
+-
+petipa/api/web.h
+-
+

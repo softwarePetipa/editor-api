@@ -2,6 +2,7 @@
 #define petipa_api_editor_h_included
 
 #include <string>
+#include <vector>
 
 namespace petipa {
 namespace api {
@@ -25,11 +26,15 @@ namespace editor {
 		bool show_rulers;
 		bool show_evolutions;
 		CharacterDisplayType character_display_type;
-		DisplayAllTristate show_characters_path;
-		DisplayAllTristate show_characters_name;
-		DisplayAllTristate show_tags_path;
-		DisplayAllTristate show_tags_label;
+		DisplayAll show_characters_path;
+		DisplayAll show_characters_name;
+		DisplayAll show_tags_path;
+		DisplayAll show_tags_label;
 	};
+	double get_minimum_line_width();
+	double get_maximum_line_width();
+	double get_minimum_fade_time();
+	double get_maximum_fade_time();
 
 	VisualizationOptions get_visualization_options();
 	bool set_visualization_options (const VisualizationOptions&);
@@ -53,7 +58,7 @@ namespace editor {
 	bool character_set_color (const std::string& name, const std::string& color);
 	bool character_set_avatar (const std::string& name, const std::string& image_path);
 	bool character_set_size (const std::string& name, double size);
-	bool character_toggle_tag (const std::string& name, const std::string&* label);
+	bool character_toggle_tag (const std::string& name, const std::string& label);
 	bool character_set_name_display_flag (const std::string& name, bool);
 	bool character_get_name_display_flag (const std::string& name);
 	bool character_set_path_display_flag (const std::string& name, bool);

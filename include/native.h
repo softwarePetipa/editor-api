@@ -1,3 +1,8 @@
+#ifndef petipa_api_native_h_included
+#define petipa_api_native_h_included
+
+#include <string>
+
 namespace petipa {
 namespace api {
 namespace native {

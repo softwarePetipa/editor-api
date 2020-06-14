@@ -2,9 +2,11 @@
 
 The main design goal of the API is to keep the Native part as thin as possible.
 
+
 ## Core--UI separation
 
 The software has two main parts:
+
 
 ### Core
 
