@@ -13,7 +13,7 @@ namespace web {
 		std::string title;
 		std::string author;
 		std::string duration;
-		size_t file_size;
+		std::string file_size;
 	};
 
 	bool login (const std::string& user_id, const std::string& password);
