@@ -1,4 +1,5 @@
 #include <string>
+#include <sstream>
 #include <unordered_map>
 #include <petipa/api/editor.h>
 #include "random.h"
@@ -63,12 +64,12 @@ ed::Character ed::get_character (const std::string& name)
 
 std::string ed::new_character()
 {
-	auto new_name;
+	std::string new_name;
 	{// Find an unique character name.
 		std::string base_name = "Anonymous";
 		new_name = base_name;
 		int n = 1;
-		while (project.characters.exists(new_name)) {
+		while (project.characters.count(new_name)) { // use .contains() in C++20
 			++n;
 			std::stringstream ss;
 			ss << base_name << " " << n;
@@ -79,7 +80,7 @@ std::string ed::new_character()
 	// create a new character
 	project.characters[new_name] = {
 		new_name,
-		petipa::ColorFactory::next().hex(),
+		"ff00ff", //TODO petipa::ColorFactory::next().hex(),
 		"",
 		{},
 		1
