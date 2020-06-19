@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libpetipa_lib.a  CMakeFiles/petipa_lib.dir/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp.o CMakeFiles/petipa_lib.dir/config.cpp.o CMakeFiles/petipa_lib.dir/dashboard.cpp.o CMakeFiles/petipa_lib.dir/version.cpp.o CMakeFiles/petipa_lib.dir/web.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libpetipa_lib.a
