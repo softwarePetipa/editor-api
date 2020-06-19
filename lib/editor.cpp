@@ -237,7 +237,7 @@ bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
 			project.tags.push_back (new_label);
 
 		// Rename tag for each character.
-		for (const auto& character_pair : project.characters) {
+		for (auto& character_pair : project.characters) {
 			auto& tags = character_pair.second.tags;
 			auto it = std::find (tags.begin(), tags.end(), old_label);
 			if (it != tags.end()) {
@@ -255,8 +255,10 @@ bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
 
 bool ed::new_tag (const std::string& label)
 {
-	if (!has_tag (label))
+	if (!has_tag (label)) {
 		project.tags.push_back (label);
+		return true;
+	}
 	else
 		return false;
 }
