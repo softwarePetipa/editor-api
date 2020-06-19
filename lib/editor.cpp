@@ -5,12 +5,15 @@
 #include "random.h"
 namespace ed = petipa::api::editor;
 
-static struct {
+static struct
+{
 	ed::VisualizationOptions visualization_options;
 	std::unordered_map<std::string, ed::Character> characters;
-} project;
+	std::vector<std::string> tags;
+}
+project;
 
-static void init()
+void ed::init()
 {
 	auto& op = project.visualization_options;
 	op.show_path_parts = random_path_display_parts();
@@ -36,18 +39,30 @@ static void init()
 	for (auto& ch : ch_array) {
 		project.characters[ch.name] = ch;
 	}
+
+	project.tags = { "tag1", "tag2", "tag3" };
 }
 
-void ed::cancel_characters_and_tags_changes() {}
+void ed::cancel_characters_and_tags_changes()
+{
+	//TODO: undo changes
+}
 
 ed::VisualizationOptions ed::get_visualization_options()
 {
 	return project.visualization_options;
 }
 
-bool ed::set_visualization_options (const ed::VisualizationOptions&) { return false; }
+bool ed::set_visualization_options (const ed::VisualizationOptions& op)
+{
+	project.visualization_options = op;
+	return true; //TODO: check consistency?
+}
 
-void ed::cancel_visualization_options_changes() {}
+void ed::cancel_visualization_options_changes()
+{
+	//TODO: undo changes
+}
 
 std::vector<std::string> ed::get_character_list()
 {
@@ -62,6 +77,12 @@ ed::Character ed::get_character (const std::string& name)
 	return project.characters[name];
 }
 
+static bool has_character (const std::string& name)
+{
+	// Use .contains() when we switch to C++20
+	return (project.characters.count(name) > 0);
+}
+
 std::string ed::new_character()
 {
 	std::string new_name;
@@ -69,7 +90,7 @@ std::string ed::new_character()
 		std::string base_name = "Anonymous";
 		new_name = base_name;
 		int n = 1;
-		while (project.characters.count(new_name)) { // use .contains() in C++20
+		while (has_character (new_name)) {
 			++n;
 			std::stringstream ss;
 			ss << base_name << " " << n;
@@ -89,21 +110,162 @@ std::string ed::new_character()
 	return new_name;
 }
 
-bool ed::delete_character (const std::string& name);
-bool ed::rename_character (const std::string& old_name, const std::string& new_name);
-bool ed::character_set_color (const std::string& name, const std::string& color);
-bool ed::character_set_avatar (const std::string& name, const std::string& image_path);
-bool ed::character_set_size (const std::string& name, double size);
-bool ed::character_toggle_tag (const std::string& name, const std::string& label);
-bool ed::character_set_name_display_flag (const std::string& name, bool);
-bool ed::character_get_name_display_flag (const std::string& name);
-bool ed::character_set_path_display_flag (const std::string& name, bool);
-bool ed::character_get_path_display_flag (const std::string& name);
+bool ed::delete_character (const std::string& name)
+{
+	return (project.characters.erase (name) > 0);
+}
 
-std::vector<std::string> ed::get_tag_list();
-bool ed::rename_tag (const std::string& old_label, const std::string& new_name);
-bool ed::new_tag (const std::string& label);
-bool ed::delete_tag (const std::string& label);
+bool ed::rename_character (const std::string& old_name, const std::string& new_name)
+{
+	if (has_character (old_name) && !has_character (new_name)) {
+		auto character = project.characters[old_name];
+		project.characters.erase (old_name);
+		character.name = new_name;
+		project.characters[new_name] = character;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_set_color (const std::string& name, const std::string& color)
+{
+	if (has_character (name)) {
+		project.characters[name].color = color;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_set_avatar (const std::string& name, const std::string& image_path)
+{
+	if (has_character (name)) {
+		project.characters[name].avatar_image_path = image_path;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_set_size (const std::string& name, double size)
+{
+	if (has_character (name)) {
+		project.characters[name].size = size;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_toggle_tag (const std::string& name, const std::string& label)
+{
+	if (has_character (name)) {
+		auto& tags = project.characters[name].tags;
+
+		auto it = std::find (tags.begin(), tags.end(), label);
+		if (it == tags.end())
+			tags.push_back (label);
+		else
+			tags.erase (it);
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_set_name_display_flag (const std::string& name, bool flag)
+{
+	if (has_character (name)) {
+		project.characters[name].show_name = flag;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_get_name_display_flag (const std::string& name)
+{
+	if (has_character (name))
+		return project.characters[name].show_name;
+	else
+		return false;
+}
+
+bool ed::character_set_path_display_flag (const std::string& name, bool flag)
+{
+	if (has_character (name)) {
+		project.characters[name].show_path = flag;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::character_get_path_display_flag (const std::string& name)
+{
+	if (has_character (name))
+		return project.characters[name].show_path;
+	else
+		return false;
+}
+
+std::vector<std::string> ed::get_tag_list()
+{
+	return project.tags;
+}
+
+static auto get_tag_itr (const std::string& label)
+{
+	return std::find (project.tags.begin(), project.tags.end(), label);
+}
+
+static bool has_tag (const std::string& label)
+{
+	return (get_tag_itr (label) != project.tags.end());
+}
+
+bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
+{
+	auto itr = get_tag_itr (old_label);
+	if (itr != project.tags.end()) {
+
+		// Replace old_label by new_label on the tag list.
+		project.tags.erase (itr);
+		if (!new_label.empty())
+			project.tags.push_back (new_label);
+
+		// Rename tag for each character.
+		for (const auto& character_pair : project.characters) {
+			auto& tags = character_pair.second.tags;
+			auto it = std::find (tags.begin(), tags.end(), old_label);
+			if (it != tags.end()) {
+				tags.erase (it);
+				if (!new_label.empty())
+					tags.push_back (new_label);
+			}
+		}
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool ed::new_tag (const std::string& label)
+{
+	if (!has_tag (label))
+		project.tags.push_back (label);
+	else
+		return false;
+}
+
+bool ed::delete_tag (const std::string& label)
+{
+	return ed::rename_tag (label, "");
+}
+
 bool ed::tag_set_label_display_flag (const std::string& label, bool);
 bool ed::tag_get_label_display_flag (const std::string& label);
 bool ed::tag_set_path_display_flag (const std::string& label, bool);
@@ -121,3 +283,5 @@ std::vector<ed::Stage> ed::get_stage_list();
 bool ed::load_stage_image (const std::string* file_path);
 bool ed::delete_stage_image (const std::string& file_path);
 bool ed::set_stage_definition (const Stage&);
+
+// vim600:fdm=syntax:fdn=1:

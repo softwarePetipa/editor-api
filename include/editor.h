@@ -8,6 +8,8 @@ namespace petipa {
 namespace api {
 namespace editor {
 
+	void init();
+
 	void cancel_characters_and_tags_changes();
 
 	struct VisualizationOptions
@@ -48,6 +50,8 @@ namespace editor {
 		std::string avatar_image_path;
 		std::vector<std::string> tags;
 		double size;
+		bool show_name;
+		bool show_path;
 	};
 
 	std::vector<std::string> get_character_list();
@@ -66,7 +70,7 @@ namespace editor {
 
 
 	std::vector<std::string> get_tag_list();
-	bool rename_tag (const std::string& old_label, const std::string& new_name);
+	bool rename_tag (const std::string& old_label, const std::string& new_label);
 	bool new_tag (const std::string& label);
 	bool delete_tag (const std::string& label);
 	bool tag_set_label_display_flag (const std::string& label, bool);
