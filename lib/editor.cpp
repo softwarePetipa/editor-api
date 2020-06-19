@@ -8,8 +8,13 @@ namespace ed = petipa::api::editor;
 static struct
 {
 	ed::VisualizationOptions visualization_options;
+
 	std::unordered_map<std::string, ed::Character> characters;
+
 	std::vector<std::string> tags;
+
+	struct DisplayFlags { bool path, label; };
+	std::unordered_map<std::string, DisplayFlags> tags_display_flags;
 }
 project;
 
@@ -268,10 +273,60 @@ bool ed::delete_tag (const std::string& label)
 	return ed::rename_tag (label, "");
 }
 
-bool ed::tag_set_label_display_flag (const std::string& label, bool);
-bool ed::tag_get_label_display_flag (const std::string& label);
-bool ed::tag_set_path_display_flag (const std::string& label, bool);
-bool ed::tag_get_path_display_flag (const std::string& label);
+static bool get_tag_display_flags (
+		const std::string& label,
+		const std::string& which)
+{
+	if (project.tags_display_flags.count (label) > 0) {
+		const auto& flags = project.tags_display_flags[label];
+		return which == "path" ? flags.path : flags.label;
+	}
+	else
+		return false;
+}
+
+static bool set_tag_display_flags (
+		const std::string& label,
+		const std::string& which,
+		bool value)
+{
+	if (has_tag (label)) {
+
+		if (project.tags_display_flags.count (label) <= 0)
+			project.tags_display_flags[label] = { false, false };
+
+		if (which == "path")
+			project.tags_display_flags[label].path = value;
+		else
+			project.tags_display_flags[label].label = value;
+
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool ed::tag_set_label_display_flag (const std::string& label, bool value)
+{
+	return set_tag_display_flags (label, "label", value);
+}
+
+bool ed::tag_get_label_display_flag (const std::string& label)
+{
+	return get_tag_display_flags (label, "label");
+}
+
+bool ed::tag_set_path_display_flag (const std::string& label, bool value)
+{
+	return set_tag_display_flags (label, "path", value);
+}
+
+bool ed::tag_get_path_display_flag (const std::string& label)
+{
+	return get_tag_display_flags (label, "path");
+}
+
 
 ed::MusicDefinition ed::get_music_definition();
 bool ed::music_preview_play (const std::string& music_title);
