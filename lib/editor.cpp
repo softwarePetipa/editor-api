@@ -49,7 +49,7 @@ void ed::init()
 
 	project.tags = { "tag1", "tag2", "tag3" };
 
-	project.music_definition = { SILENCE, "", "", 0, 5, 0 };
+	project.music_definition = { ed::MusicDefinition::Type::SILENCE, "", "", 0, 5, 0 };
 }
 
 void ed::cancel_characters_and_tags_changes()
@@ -350,9 +350,10 @@ bool ed::music_preview_stop()
 bool ed::set_music_file (const std::string& music_path)
 {
 	auto& def = project.music_definition;
-	def.type = ed::MusicDefinitionType::CUSTOM;
+	def.type = ed::MusicDefinition::Type::CUSTOM;
 	def.file_path = music_path;
-	//TODO load music, set duration fields
+	//TODO load music, set duration fields, validate
+	return true;
 }
 
 bool ed::set_stock_music (const std::string& music_title)
@@ -360,7 +361,7 @@ bool ed::set_stock_music (const std::string& music_title)
 	for (const auto& stock_music : petipa::api::web::get_stock_music_list()) {
 		if (stock_music.title == music_title) {
 			auto& def = project.music_definition;
-			def.type = ed::MusicDefinitionType::STOCK;
+			def.type = ed::MusicDefinition::Type::STOCK;
 			def.file_path = petipa::api::web::download_stock_music (music_title, "." /*TODO*/);
 			def.stock_title = music_title;
 			def.duration_hours = stock_music.duration_hours;
@@ -376,12 +377,13 @@ bool ed::set_stock_music (const std::string& music_title)
 bool ed::set_silence (unsigned int hours, unsigned int minutes, unsigned int seconds)
 {
 	auto& def = project.music_definition;
-	def.type = ed::MusicDefinitionType::SILENCE;
+	def.type = ed::MusicDefinition::Type::SILENCE;
 	def.file_path = "";
 	def.stock_title = "";
 	def.duration_hours = hours;
 	def.duration_minutes = minutes;
 	def.duration_seconds = seconds;
+	return true; //TODO validate parameters
 }
 
 ed::Stage ed::get_stage_definition();

@@ -80,7 +80,7 @@ namespace editor {
 
 	struct MusicDefinition
 	{
-		enum class MusicDefinitionType { CUSTOM, STOCK, SILENCE } type;
+		enum class Type { CUSTOM, STOCK, SILENCE } type;
 		std::string file_path;
 		std::string stock_title;
 		unsigned int duration_hours;
