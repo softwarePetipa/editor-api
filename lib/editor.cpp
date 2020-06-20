@@ -3,11 +3,13 @@
 #include <unordered_map>
 #include <petipa/api/editor.h>
 #include "random.h"
+#include "web.h"
 namespace ed = petipa::api::editor;
 
 static struct
 {
 	ed::VisualizationOptions visualization_options;
+	ed::MusicDefinition music_definition;
 
 	std::unordered_map<std::string, ed::Character> characters;
 
@@ -46,6 +48,8 @@ void ed::init()
 	}
 
 	project.tags = { "tag1", "tag2", "tag3" };
+
+	project.music_definition = { SILENCE, "", "", 0, 5, 0 };
 }
 
 void ed::cancel_characters_and_tags_changes()
@@ -328,12 +332,57 @@ bool ed::tag_get_path_display_flag (const std::string& label)
 }
 
 
-ed::MusicDefinition ed::get_music_definition();
-bool ed::music_preview_play (const std::string& music_title);
-bool ed::music_preview_stop();
-bool ed::set_music_file (const std::string& music_path);
-bool ed::set_stock_music (const std::string& music_title);
-bool ed::set_silence (unsigned int hours, unsigned int minutes, unsigned int seconds);
+ed::MusicDefinition ed::get_music_definition()
+{
+	return project.music_definition;
+}
+
+bool ed::music_preview_play (const std::string& music_title)
+{
+	return true;
+}
+
+bool ed::music_preview_stop()
+{
+	return true;
+}
+
+bool ed::set_music_file (const std::string& music_path)
+{
+	auto& def = project.music_definition;
+	def.type = ed::MusicDefinitionType::CUSTOM;
+	def.file_path = music_path;
+	//TODO load music, set duration fields
+}
+
+bool ed::set_stock_music (const std::string& music_title)
+{
+	for (const auto& stock_music : petipa::api::web::get_stock_music_list()) {
+		if (stock_music.title == music_title) {
+			auto& def = project.music_definition;
+			def.type = ed::MusicDefinitionType::STOCK;
+			def.file_path = petipa::api::web::download_stock_music (music_title, "." /*TODO*/);
+			def.stock_title = music_title;
+			def.duration_hours = stock_music.duration_hours;
+			def.duration_minutes = stock_music.duration_minutes;
+			def.duration_seconds = stock_music.duration_seconds;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool ed::set_silence (unsigned int hours, unsigned int minutes, unsigned int seconds)
+{
+	auto& def = project.music_definition;
+	def.type = ed::MusicDefinitionType::SILENCE;
+	def.file_path = "";
+	def.stock_title = "";
+	def.duration_hours = hours;
+	def.duration_minutes = minutes;
+	def.duration_seconds = seconds;
+}
 
 ed::Stage ed::get_stage_definition();
 std::vector<ed::Stage> ed::get_stage_list();

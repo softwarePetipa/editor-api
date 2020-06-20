@@ -14,6 +14,9 @@ namespace web {
 		std::string author;
 		std::string duration;
 		std::string file_size;
+		unsigned int duration_hours;
+		unsigned int duration_minutes;
+		unsigned int duration_seconds;
 	};
 
 	bool login (const std::string& user_id, const std::string& password);
@@ -23,7 +26,9 @@ namespace web {
 	std::string get_bottom_banner_content();
 
 	std::vector<StockMusic> get_stock_music_list();
-	void download_stock_music (const std::string& title, const std::string& output_dir);
+
+	// Returns the local file path of the downloaded file.
+	std::string download_stock_music (const std::string& title, const std::string& output_dir);
 
 }}}
 
