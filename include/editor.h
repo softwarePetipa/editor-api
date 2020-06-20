@@ -107,7 +107,7 @@ namespace editor {
 
 	Stage get_stage_definition();
 	std::vector<Stage> get_stage_list();
-	bool load_stage_image (const std::string* file_path);
+	bool load_stage_image (const std::string& file_path);
 	bool delete_stage_image (const std::string& file_path);
 	bool set_stage_definition (const Stage&);
 

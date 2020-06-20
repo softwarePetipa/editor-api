@@ -4,12 +4,15 @@
 #include <petipa/api/editor.h>
 #include "random.h"
 #include "web.h"
+#include "fs.h"
 namespace ed = petipa::api::editor;
 
 static struct
 {
 	ed::VisualizationOptions visualization_options;
 	ed::MusicDefinition music_definition;
+	std::vector<ed::Stage> stages;
+	std::string selected_stage;
 
 	std::unordered_map<std::string, ed::Character> characters;
 
@@ -50,6 +53,12 @@ void ed::init()
 	project.tags = { "tag1", "tag2", "tag3" };
 
 	project.music_definition = { ed::MusicDefinition::Type::SILENCE, "", "", 0, 5, 0 };
+	project.stages = {
+		{ 8, 5, "Rectangle", "rectangle.png", true, false },
+		{ 8, 5, "Italian", "italian.png", true, true },
+		{ 8, 5, "Hexagonal", "hexagonal.png", true, false },
+		{ 8, 5, "Circle", "circle.png", true, false },
+	};
 }
 
 void ed::cancel_characters_and_tags_changes()
@@ -386,10 +395,92 @@ bool ed::set_silence (unsigned int hours, unsigned int minutes, unsigned int sec
 	return true; //TODO validate parameters
 }
 
-ed::Stage ed::get_stage_definition();
-std::vector<ed::Stage> ed::get_stage_list();
-bool ed::load_stage_image (const std::string* file_path);
-bool ed::delete_stage_image (const std::string& file_path);
-bool ed::set_stage_definition (const Stage&);
+ed::Stage ed::get_stage_definition()
+{
+	for (const auto& s : project.stages) {
+		if (s.is_selected)
+			return s;
+	}
+	return {0,0,"","",false,false};
+}
+
+std::vector<ed::Stage> ed::get_stage_list()
+{
+	return project.stages;
+}
+
+bool stage_exists (const std::string& name)
+{
+	for (const auto& stage : project.stages) {
+		if (stage.label == name)
+			return true;
+	}
+	return false;
+}
+
+bool ed::load_stage_image (const std::string& file_path)
+{
+	//TODO check if valid image
+
+	std::string name;
+	{// get an unique name for the new stage
+
+		fs::path path (file_path);
+		std::string base_name = path.stem().string();
+		name = base_name;
+		unsigned n = 1;
+		while (stage_exists (name)) {
+			++n;
+			std::stringstream ss;
+			ss << base_name << " (" << n << ")";
+			name = ss.str();
+		}
+	}
+
+	//TODO copy image to data dir
+	std::string copied_path = file_path;
+	project.stages.push_back ({ 8, 5, name, copied_path, false, true });
+	return true;
+}
+
+bool ed::delete_stage_image (const std::string& file_path)
+{
+	for (const auto& stage : project.stages) {
+		if (stage.label == name)
+			return true;
+	}
+	return false;
+}
+
+bool ed::set_stage_definition (const Stage& stage)
+{
+	if (stage.width <= 0 || stage.width <= 0) {
+		petipa::api::native::alert ("Error", "Stage dimentions need to be positive.");
+		return false;
+	}
+
+	bool found = false;
+	for (const auto& s : project.stages) {
+#if 0 // compact
+		found ||= s.is_selected = (s.label == stage.name);
+#else // readable
+		if (s.label == stage.name) {
+			s.is_selected = true;
+			found = true;
+		}
+		else {
+			s.is_selected = false;
+		}
+#endif
+	}
+
+	if (found) {
+		return true;
+	}
+	else {
+		petipa::api::native::alert ("Error", "Something strange happened.");
+		retur false;
+	}
+}
 
 // vim600:fdm=syntax:fdn=1:
