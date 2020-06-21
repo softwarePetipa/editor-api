@@ -1,7 +1,8 @@
 #include <string>
 #include <sstream>
 #include <unordered_map>
-#include <petipa/api/editor.h>
+#include "../include/editor.h"
+#include "../include/native.h"
 #include "random.h"
 #include "web.h"
 #include "fs.h"

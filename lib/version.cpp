@@ -1,5 +1,5 @@
 #include <string>
-#include <petipa/api/version.h>
+#include "../include/version.h"
 
 std::string petipa::api::get_version()
 {

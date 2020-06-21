@@ -1,4 +1,4 @@
-#include <petipa/api/config.h>
+#include "../include/config.h"
 
 static bool alpha_sort = false;
 static bool dark_mode = false;

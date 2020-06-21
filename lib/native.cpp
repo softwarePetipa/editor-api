@@ -1,4 +1,4 @@
-#include <petipa/api/native.h>
+#include "../include/native.h"
 
 void petipa::api::native::open_visualization_options_dialog() {}
 void petipa::api::native::open_characters_dialog (const std::string& character_name) {}

@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
-#include <petipa/api/config.h>
-#include <petipa/api/dashboard.h>
+#include "../include/config.h"
+#include "../include/dashboard.h"
 namespace db = petipa::api::dashboard;
 
 std::string db::get_new_name (const std::string& project_name)

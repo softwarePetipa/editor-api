@@ -1,5 +1,5 @@
 #include <random>
-#include <petipa/api/editor.h>
+#include "../include/editor.h"
 namespace ed = petipa::api::editor;
 
 static std::random_device rd;
