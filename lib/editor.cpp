@@ -445,10 +445,7 @@ bool ed::load_stage_image (const std::string& file_path)
 
 bool ed::delete_stage_image (const std::string& file_path)
 {
-	for (const auto& stage : project.stages) {
-		if (stage.label == name)
-			return true;
-	}
+	//TODO
 	return false;
 }
 
@@ -460,11 +457,11 @@ bool ed::set_stage_definition (const Stage& stage)
 	}
 
 	bool found = false;
-	for (const auto& s : project.stages) {
+	for (auto& s : project.stages) {
 #if 0 // compact
-		found ||= s.is_selected = (s.label == stage.name);
+		found ||= s.is_selected = (s.label == stage.label);
 #else // readable
-		if (s.label == stage.name) {
+		if (s.label == stage.label) {
 			s.is_selected = true;
 			found = true;
 		}
@@ -479,7 +476,7 @@ bool ed::set_stage_definition (const Stage& stage)
 	}
 	else {
 		petipa::api::native::alert ("Error", "Something strange happened.");
-		retur false;
+		return false;
 	}
 }
 
