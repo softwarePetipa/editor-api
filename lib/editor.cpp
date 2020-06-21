@@ -177,12 +177,22 @@ bool ed::character_set_size (const std::string& name, double size)
 		return false;
 }
 
+static auto find (std::vector<std::string>& vec, const std::string& str)
+{
+	for (auto it = vec.begin();  it != vec.end();  ++it) {
+		if (*it == str)
+			return it;
+	}
+
+	return vec.end();
+}
+
 bool ed::character_toggle_tag (const std::string& name, const std::string& label)
 {
 	if (has_character (name)) {
 		auto& tags = project.characters[name].tags;
 
-		auto it = std::find (tags.begin(), tags.end(), label);
+		auto it = find (tags, label);
 		if (it == tags.end())
 			tags.push_back (label);
 		else
@@ -235,19 +245,14 @@ std::vector<std::string> ed::get_tag_list()
 	return project.tags;
 }
 
-static auto get_tag_itr (const std::string& label)
-{
-	return std::find (project.tags.begin(), project.tags.end(), label);
-}
-
 static bool has_tag (const std::string& label)
 {
-	return (get_tag_itr (label) != project.tags.end());
+	return (find (project.tags, label) != project.tags.end());
 }
 
 bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
 {
-	auto itr = get_tag_itr (old_label);
+	auto itr = find (project.tags, old_label);
 	if (itr != project.tags.end()) {
 
 		// Replace old_label by new_label on the tag list.
@@ -257,12 +262,12 @@ bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
 
 		// Rename tag for each character.
 		for (auto& character_pair : project.characters) {
-			auto& tags = character_pair.second.tags;
-			auto it = std::find (tags.begin(), tags.end(), old_label);
-			if (it != tags.end()) {
-				tags.erase (it);
+			auto& character_tags = character_pair.second.tags;
+			auto it = find (character_tags, old_label);
+			if (it != character_tags.end()) {
+				character_tags.erase (it);
 				if (!new_label.empty())
-					tags.push_back (new_label);
+					character_tags.push_back (new_label);
 			}
 		}
 
