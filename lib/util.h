@@ -2,28 +2,22 @@
 #define petipa_lib_util_h_included
 
 #include <string>
-#include <vector>
 #include <sstream>
+#include <algorithm>
 
 namespace petipa {
 namespace util {
-
-template <typename T, typename F>
-bool collection_has_name (const T& collection, const std::string& name, F get_element_name)
-{
-	for (const auto& element : collection) {
-		if (get_element_name (element) == name)
-			return true;
-	}
-	return false;
-}
 
 template <typename T, typename F>
 std::string get_new_name (const T& collection, const std::string& base_name, F get_element_name)
 {
 	std::string new_name = base_name;
 	int n = 1;
-	while (collection_has_name (collection, new_name, get_element_name)) {
+	while (find_if (collection.begin(), collection.end(),
+				[&](const auto& element) {
+					return (get_element_name (element) == new_name);
+				}) != collection.end())
+	{
 		++n;
 		std::stringstream ss;
 		ss << base_name << " (" << n << ")";
