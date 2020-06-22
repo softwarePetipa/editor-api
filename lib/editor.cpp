@@ -112,7 +112,7 @@ std::string ed::new_character()
 		while (has_character (new_name)) {
 			++n;
 			std::stringstream ss;
-			ss << base_name << " " << n;
+			ss << base_name << " (" << n << ")";
 			new_name = ss.str();
 		}
 	}
