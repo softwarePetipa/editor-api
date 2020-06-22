@@ -9,9 +9,6 @@ namespace petipa {
 namespace api {
 namespace dashboard {
 
-	bool is_bottom_banner_visible();
-	void hide_bottom_banner();
-
 	struct ProjectListSection {
 		std::string label;
 		std::vector<std::string> project_names;

@@ -17,8 +17,6 @@ bool db::open_new_project (void* system_context) { return false; }
 bool db::open_project_file (const std::string& file_path, void* system_context) { return false; }
 bool db::copy_and_open_project (const std::string& project_name, void* system_context) { return false; }
 bool db::import_and_open_project (const std::string& file_path, void* system_context) { return false; }
-bool db::is_bottom_banner_visible() { return false; }
-void db::hide_bottom_banner() {}
 
 std::vector<db::ProjectListSection> db::get_project_list_sections()
 {

@@ -14,6 +14,8 @@ namespace config {
 	void toggle_dashboard_alphabetic_sort();
 	bool get_dashboard_alphabetic_sort();
 
+	bool is_bottom_banner_visible();
+	void hide_bottom_banner();
 }}}
 
 #endif
