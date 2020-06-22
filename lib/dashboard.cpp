@@ -76,6 +76,8 @@ std::vector<db::ProjectListSection> db::get_project_list_sections()
 		s2.label = "outros";
 		s2.projects.push_back(projects[2]);
 		s2.projects.push_back(projects[3]);
+		sections.push_back(s1);
+		sections.push_back(s2);
 	}
 	return sections;
 }
