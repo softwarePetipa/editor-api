@@ -1,31 +1,18 @@
 #include <string>
-#include <sstream>
 #include <vector>
 #include "../include/config.h"
 #include "../include/dashboard.h"
 #include "run.h"
+#include "util.h"
 namespace db = petipa::api::dashboard;
 
-static std::vector<db::Project> projects = {
+static std::vector<db::Project> projects =
+{
 	{ "Um sonho", "há poucos minutos", "19:02" },
 	{ "Dança de fim de ano", "anteontem", "8:40" },
 	{ "Projeto pessoal", "10 de abril", "3:30" },
 	{ "Mega espetáculo", "2018/04/30", "1:43:14" },
 };
-
-static bool has_project (const std::string& name)
-{
-	for (const auto& p : projects) {
-		if (p.name == name)
-			return true;
-	}
-	return false;
-}
-
-std::string db::get_new_name (const std::string& project_name)
-{
-	return "new name";
-}
 
 bool db::open_project (const std::string& project_name, void* system_context)
 {
@@ -38,18 +25,10 @@ bool db::rename_project (const std::string& old_name, const std::string& new_nam
 
 bool db::open_new_project (void* system_context)
 {
-	std::string new_name;
-	{// Find an unique project name.
-		std::string base_name = "Project";
-		new_name = base_name;
-		int n = 1;
-		while (has_project (new_name)) {
-			++n;
-			std::stringstream ss;
-			ss << base_name << " (" << n << ")";
-			new_name = ss.str();
-		}
-	}
+	std::string new_name = petipa::util::get_new_name (
+			projects,
+			"Project",
+			[](const auto& e){ return e.name; });
 
 	return db::open_project (new_name, system_context);
 }
@@ -111,3 +90,5 @@ std::string db::get_project_file_extension()
 {
 	return "petipa";
 }
+
+// vim600:fdm=syntax:fdn=1:

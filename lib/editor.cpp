@@ -1,9 +1,9 @@
 #include <string>
-#include <sstream>
 #include <unordered_map>
 #include "../include/editor.h"
 #include "../include/native.h"
 #include "random.h"
+#include "util.h"
 #include "web.h"
 #include "fs.h"
 namespace ed = petipa::api::editor;
@@ -104,18 +104,10 @@ static bool has_character (const std::string& name)
 
 std::string ed::new_character()
 {
-	std::string new_name;
-	{// Find an unique character name.
-		std::string base_name = "Anonymous";
-		new_name = base_name;
-		int n = 1;
-		while (has_character (new_name)) {
-			++n;
-			std::stringstream ss;
-			ss << base_name << " (" << n << ")";
-			new_name = ss.str();
-		}
-	}
+	std::string new_name = petipa::util::get_new_name (
+			project.characters,
+			"Anonymouse",
+			[](const auto& e){ return e.first; });
 
 	// create a new character
 	project.characters[new_name] = {
@@ -239,6 +231,7 @@ bool ed::character_get_path_display_flag (const std::string& name)
 	else
 		return false;
 }
+
 
 std::vector<std::string> ed::get_tag_list()
 {
@@ -401,6 +394,7 @@ bool ed::set_silence (unsigned int hours, unsigned int minutes, unsigned int sec
 	return true; //TODO validate parameters
 }
 
+
 ed::Stage ed::get_stage_definition()
 {
 	for (const auto& s : project.stages) {
@@ -415,33 +409,16 @@ std::vector<ed::Stage> ed::get_stage_list()
 	return project.stages;
 }
 
-bool stage_exists (const std::string& name)
-{
-	for (const auto& stage : project.stages) {
-		if (stage.label == name)
-			return true;
-	}
-	return false;
-}
-
 bool ed::load_stage_image (const std::string& file_path)
 {
 	//TODO check if valid image
 
-	std::string name;
-	{// get an unique name for the new stage
-
-		fs::path path (file_path);
-		std::string base_name = path.stem().string();
-		name = base_name;
-		unsigned n = 1;
-		while (stage_exists (name)) {
-			++n;
-			std::stringstream ss;
-			ss << base_name << " (" << n << ")";
-			name = ss.str();
-		}
-	}
+	fs::path path (file_path);
+	std::string base_name = path.stem().string();
+	std::string name = petipa::util::get_new_name (
+			project.stages,
+			base_name,
+			[](const auto& e) { return e.label; });
 
 	//TODO copy image to data dir
 	std::string copied_path = file_path;
