@@ -91,4 +91,12 @@ std::string db::get_project_file_extension()
 	return "petipa";
 }
 
+std::string db::get_new_name (const std::string& project_name)
+{
+	return petipa::util::get_new_name (
+			projects,
+			project_name,
+			[](const auto& e){ return e.name; });
+}
+
 // vim600:fdm=syntax:fdn=1:
