@@ -11,6 +11,9 @@ namespace util {
 template <typename T, typename F>
 std::string get_new_name (const T& collection, const std::string& base_name, F get_element_name)
 {
+	//FIXME: "Noname (2)" should yield "Noname (3)", not "Noname (2) (2)".
+	// Use regex to get current " (number)", and increment it.
+
 	std::string new_name = base_name;
 	int n = 1;
 	while (find_if (collection.begin(), collection.end(),

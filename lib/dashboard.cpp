@@ -21,7 +21,17 @@ bool db::open_project (const std::string& project_name, void* system_context)
 
 bool db::delete_project (const std::string& project_name) { return false; }
 bool db::export_project (const std::string& project_name, const std::string& file_path) { return false; }
-bool db::rename_project (const std::string& old_name, const std::string& new_name) { return false; }
+
+bool db::rename_project (const std::string& old_name, const std::string& new_name)
+{
+	auto itr = std::find_if (projects.begin(), projects.end(), [&](const auto& project) { return project.name == old_name; });
+	if (itr != projects.end()) {
+		itr->name = new_name;
+		return true;
+	}
+	else
+		return false;
+}
 
 bool db::open_new_project (void* system_context)
 {
