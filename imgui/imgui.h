@@ -75,7 +75,7 @@ struct Context
 class Editor
 {//
 public:
-	Editor();
+	Editor (const std::string&);
 	~Editor();
 	void draw_frame() {}
 	void loop_step();
@@ -84,7 +84,22 @@ public:
 
 private:
 	void handle_mouse_move();
-	Button button_exit, button_alert;
+
+	Button button_alert;
+	Button button_confirm;
+	Button button_input;
+	Button button_share;
+	Button button_open_url;
+	Button button_exit;
+
+	Button button_visualization_options;
+	Button button_characters_dialog;
+	Button button_music;
+	Button button_stage;
+	Button button_notifications;
+	Button button_about;
+
+	std::string project_name;
 };
 
 struct Resources

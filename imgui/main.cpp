@@ -39,9 +39,9 @@ static bool init_sdl()
 	return true;
 }
 
-bool petipa::imgui::run (void*)
+bool petipa::imgui::run (const std::string& project_name, void*)
 {
-	res.editor = new petipa::imgui::Editor();
+	res.editor = new petipa::imgui::Editor (project_name);
 	res.font_cache = new petipa::imgui::FontCache();
 
 	if (!init_sdl())
