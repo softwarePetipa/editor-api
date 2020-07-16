@@ -1,9 +1,10 @@
 #include <string>
-#include <sstream>
+#include <algorithm>
 #include <unordered_map>
 #include "../include/editor.h"
 #include "../include/native.h"
 #include "random.h"
+#include "util.h"
 #include "web.h"
 #include "fs.h"
 namespace ed = petipa::api::editor;
@@ -62,6 +63,22 @@ void ed::init()
 	};
 }
 
+double ed::get_maximum_line_width() {
+	return 0;
+}
+
+double ed::get_maximum_fade_time() {
+	return 0;
+}
+
+double ed::get_minimum_fade_time() {
+	return 0;
+}
+
+double ed::get_minimum_line_width() {
+    return 0;
+}
+
 void ed::cancel_characters_and_tags_changes()
 {
 	//TODO: undo changes
@@ -104,18 +121,10 @@ static bool has_character (const std::string& name)
 
 std::string ed::new_character()
 {
-	std::string new_name;
-	{// Find an unique character name.
-		std::string base_name = "Anonymous";
-		new_name = base_name;
-		int n = 1;
-		while (has_character (new_name)) {
-			++n;
-			std::stringstream ss;
-			ss << base_name << " " << n;
-			new_name = ss.str();
-		}
-	}
+	std::string new_name = petipa::util::get_new_name (
+			project.characters,
+			"Anonymouse",
+			[](const auto& e){ return e.first; });
 
 	// create a new character
 	project.characters[new_name] = {
@@ -177,22 +186,12 @@ bool ed::character_set_size (const std::string& name, double size)
 		return false;
 }
 
-static auto find (std::vector<std::string>& vec, const std::string& str)
-{
-	for (auto it = vec.begin();  it != vec.end();  ++it) {
-		if (*it == str)
-			return it;
-	}
-
-	return vec.end();
-}
-
 bool ed::character_toggle_tag (const std::string& name, const std::string& label)
 {
 	if (has_character (name)) {
 		auto& tags = project.characters[name].tags;
 
-		auto it = find (tags, label);
+		auto it = std::find (tags.begin(), tags.end(), label);
 		if (it == tags.end())
 			tags.push_back (label);
 		else
@@ -240,19 +239,25 @@ bool ed::character_get_path_display_flag (const std::string& name)
 		return false;
 }
 
+
 std::vector<std::string> ed::get_tag_list()
 {
 	return project.tags;
 }
 
+static auto get_tag_itr (const std::string& label)
+{
+	return std::find (project.tags.begin(), project.tags.end(), label);
+}
+
 static bool has_tag (const std::string& label)
 {
-	return (find (project.tags, label) != project.tags.end());
+	return (get_tag_itr (label) != project.tags.end());
 }
 
 bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
 {
-	auto itr = find (project.tags, old_label);
+	auto itr = get_tag_itr (old_label);
 	if (itr != project.tags.end()) {
 
 		// Replace old_label by new_label on the tag list.
@@ -262,12 +267,12 @@ bool ed::rename_tag (const std::string& old_label, const std::string& new_label)
 
 		// Rename tag for each character.
 		for (auto& character_pair : project.characters) {
-			auto& character_tags = character_pair.second.tags;
-			auto it = find (character_tags, old_label);
-			if (it != character_tags.end()) {
-				character_tags.erase (it);
+			auto& tags = character_pair.second.tags;
+			auto it = std::find (tags.begin(), tags.end(), old_label);
+			if (it != tags.end()) {
+				tags.erase (it);
 				if (!new_label.empty())
-					character_tags.push_back (new_label);
+					tags.push_back (new_label);
 			}
 		}
 
@@ -401,6 +406,7 @@ bool ed::set_silence (unsigned int hours, unsigned int minutes, unsigned int sec
 	return true; //TODO validate parameters
 }
 
+
 ed::Stage ed::get_stage_definition()
 {
 	for (const auto& s : project.stages) {
@@ -415,37 +421,20 @@ std::vector<ed::Stage> ed::get_stage_list()
 	return project.stages;
 }
 
-bool stage_exists (const std::string& name)
-{
-	for (const auto& stage : project.stages) {
-		if (stage.label == name)
-			return true;
-	}
-	return false;
-}
-
 bool ed::load_stage_image (const std::string& file_path)
 {
 	//TODO check if valid image
-
-	std::string name;
-	{// get an unique name for the new stage
-
-		fs::path path (file_path);
-		std::string base_name = path.stem().string();
-		name = base_name;
-		unsigned n = 1;
-		while (stage_exists (name)) {
-			++n;
-			std::stringstream ss;
-			ss << base_name << " (" << n << ")";
-			name = ss.str();
-		}
-	}
-
-	//TODO copy image to data dir
-	std::string copied_path = file_path;
-	project.stages.push_back ({ 8, 5, name, copied_path, false, true });
+	//TODO filesystem not supported yet
+//	fs::path path (file_path);
+//	std::string base_name = path.stem().string();
+//	std::string name = petipa::util::get_new_name (
+//			project.stages,
+//			base_name,
+//			[](const auto& e) { return e.label; });
+//
+//	//TODO copy image to data dir
+//	std::string copied_path = file_path;
+//	project.stages.push_back ({ 8, 5, name, copied_path, false, true });
 	return true;
 }
 
