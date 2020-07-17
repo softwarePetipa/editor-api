@@ -18,5 +18,6 @@ std::vector<web::StockMusic> web::get_stock_music_list()
 	rc.push_back ({ "Raymonda", "A. Glazunov", "3:39", "4.9 Mb"});
 	return rc;
 }
-
-std::string download_stock_music (const std::string& title, const std::string& output_dir);
+std::string web::download_stock_music (const std::string& title, const std::string& output_dir) {
+	return "";
+}

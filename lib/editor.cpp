@@ -63,6 +63,22 @@ void ed::init()
 	};
 }
 
+double ed::get_maximum_line_width() {
+	return 0;
+}
+
+double ed::get_maximum_fade_time() {
+	return 0;
+}
+
+double ed::get_minimum_fade_time() {
+	return 0;
+}
+
+double ed::get_minimum_line_width() {
+    return 0;
+}
+
 void ed::cancel_characters_and_tags_changes()
 {
 	//TODO: undo changes
@@ -408,17 +424,17 @@ std::vector<ed::Stage> ed::get_stage_list()
 bool ed::load_stage_image (const std::string& file_path)
 {
 	//TODO check if valid image
-
-	fs::path path (file_path);
-	std::string base_name = path.stem().string();
-	std::string name = petipa::util::get_new_name (
-			project.stages,
-			base_name,
-			[](const auto& e) { return e.label; });
-
-	//TODO copy image to data dir
-	std::string copied_path = file_path;
-	project.stages.push_back ({ 8, 5, name, copied_path, false, true });
+	//TODO filesystem not supported yet
+//	fs::path path (file_path);
+//	std::string base_name = path.stem().string();
+//	std::string name = petipa::util::get_new_name (
+//			project.stages,
+//			base_name,
+//			[](const auto& e) { return e.label; });
+//
+//	//TODO copy image to data dir
+//	std::string copied_path = file_path;
+//	project.stages.push_back ({ 8, 5, name, copied_path, false, true });
 	return true;
 }
 

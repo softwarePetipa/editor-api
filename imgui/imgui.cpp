@@ -1,7 +1,7 @@
 #include "imgui.h"
-#include <SOIL2.h>
 #include "text.h"
-#include "../imgui/GL.h"
+#include "GL.h"
+#include <SOIL2.h>
 
 extern petipa::imgui::Resources res;
 petipa::imgui::Context ctx;
@@ -72,7 +72,7 @@ void petipa::imgui::loop_step()
 		res.editor->update (ctx.frame_interval);
 
 		glViewport (0, 0, m*res.width, m*res.height);
-		glMatrixMode (GL_PROJECTION);
+//		glMatrixMode (GL_PROJECTION);
 
 		// Render scene.
 		glClear (GL_COLOR_BUFFER_BIT);
@@ -80,8 +80,8 @@ void petipa::imgui::loop_step()
 
 		// Prepare to render UI elements.
 		glViewport (0, 0, m*res.width, m*res.height);
-		glLoadIdentity();
-		gluOrtho2D (0, res.width, res.height, 0);
+//		glLoadIdentity();
+//		glOrtho (0, res.width, res.height, 0, -1, 1);
 
 		if (!ctx.unfocus) {
 			ctx.hot = false;
@@ -147,23 +147,23 @@ static void render_button (petipa::imgui::Button& b, int x, int y)
 		// apply texture
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, b.icons[b.state].texture_id);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-		glColor4f (0, 0, 0, alpha);
+//		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+//		glColor4f (0, 0, 0, alpha);
 	}
 	else { // no textures
 
 		float state_colors[][3] = { {1.,1.,1.}, {0x77/255.,0x66/255.,1.}, {.4,.4,1.}, {1.,.4,.4} };
 		float* color = state_colors[b.state];
-		glColor4f (color[0], color[1], color[2], alpha);
+//		glColor4f (color[0], color[1], color[2], alpha);
 	}
 
 	// draw rectangle
-	glBegin(GL_POLYGON);
-		glTexCoord2f(0, 0);  glVertex2f(x, y);
-		glTexCoord2f(1, 0);  glVertex2f(x+b.w-1, y);
-		glTexCoord2f(1, 1);  glVertex2f(x+b.w-1, y+b.h-1);
-		glTexCoord2f(0, 1);  glVertex2f(x, y+b.h-1);
-	glEnd();
+//	glBegin(GL_POLYGON);
+//		glTexCoord2f(0, 0);  glVertex2f(x, y);
+//		glTexCoord2f(1, 0);  glVertex2f(x+b.w-1, y);
+//		glTexCoord2f(1, 1);  glVertex2f(x+b.w-1, y+b.h-1);
+//		glTexCoord2f(0, 1);  glVertex2f(x, y+b.h-1);
+//	glEnd();
 
 	// finalize OpenGL state
 	glDisable(GL_BLEND);
@@ -172,7 +172,7 @@ static void render_button (petipa::imgui::Button& b, int x, int y)
 
 	// draw text label
 	if (!b.label.empty()) {
-		glColor4f (0, 0, 0, 1);
+//		glColor4f (0, 0, 0, 1);
 		petipa::imgui::render_text (res.font_cache, x+4, y+4, b.w-8, b.h-8, b.label.c_str());
 	}
 }
