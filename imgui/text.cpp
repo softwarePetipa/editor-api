@@ -18,6 +18,5 @@ void petipa::imgui::render_text (petipa::imgui::FontCache* cache, double x, doub
 //		glTexCoord2f(1,1);  glVertex2d(x+ft.w, y+ft.h);
 //		glTexCoord2f(0,1);  glVertex2d(x+0,    y+ft.h);
 //	glEnd();
-
 	glDisable(GL_TEXTURE_2D);
 }
