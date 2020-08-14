@@ -2,6 +2,10 @@
 #include "GL.h"
 #include "imgui.h"
 #include "text.h"
+#include "icons/character.h"
+#include "icons/eye.h"
+#include "icons/music.h"
+#include "icons/theater.h"
 
 extern petipa::imgui::Resources res;
 extern petipa::imgui::Context ctx;
@@ -13,10 +17,10 @@ petipa::imgui::Editor::Editor (const std::string& project_name_arg) :
 	button_share ("share", 160,40),
 	button_open_url ("open url", 160,40),
 	button_exit ("exit", 160,40),
-	button_visualization_options ("visualization options", 240,40),
-	button_characters_dialog ("characters & tags", 240,40),
-	button_music ("music setup", 240,40),
-	button_stage ("stage setup", 240,40),
+	button_visualization_options (60, 60, ICON(eye)),
+	button_characters_dialog (60, 60, ICON(character)),
+	button_music (60, 60, ICON(music)),
+	button_stage (60, 60, ICON(theater)),
 	button_notifications ("notifications", 240,40),
 	button_about ("about", 240,40),
 	project_name (project_name_arg)

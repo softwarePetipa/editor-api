@@ -148,7 +148,7 @@ static void render_button (petipa::imgui::Button& b, int x, int y)
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, b.icons[b.state].texture_id);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-		glColor4f (0, 0, 0, alpha);
+		glColor4f (1, 1, 1, alpha);
 	}
 	else { // no textures
 
