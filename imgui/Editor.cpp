@@ -1,7 +1,5 @@
 #include "native.h"
-#include "GL.h"
-#include "imgui.h"
-#include "text.h"
+#include "Editor.h"
 #include "icons/character.h"
 #include "icons/eye.h"
 #include "icons/music.h"
@@ -36,7 +34,7 @@ void petipa::imgui::Editor::loop_step()
 	ctx.layout.spacing = 10;
 
 	// Render *and* intereact with UI elements.
-	petipa::imgui::layout_start (Layout::Type::VERTICAL_DOWN_ALIGN_RIGHT, res.width, 0);
+	petipa::imgui::layout_start (Layout::Type::VERTICAL_DOWN_ALIGN_RIGHT, ctx.width, 0);
 	if (do_button (button_alert))
 		petipa::api::native::alert ("Test", "Hi, there.");
 	if (do_button (button_confirm))
@@ -55,7 +53,7 @@ void petipa::imgui::Editor::loop_step()
 	if (do_button (button_open_url))
 		petipa::api::native::open_url ("https://petipa.dance/");
 	if (do_button (button_exit))
-		res.running = false;
+		ctx.running = false;
 
 	petipa::imgui::layout_start (Layout::Type::VERTICAL_DOWN_ALIGN_LEFT, 0, 0);
 	if (do_button (button_visualization_options))

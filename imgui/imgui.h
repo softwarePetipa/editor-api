@@ -1,9 +1,9 @@
 #ifndef petipa_imgui_imgui_h_included
 #define petipa_imgui_imgui_h_included
 
-#include <SDL.h>
 #include <string>
-#include "FontCache.h"
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_font.h>
 
 #define ICON(a) a##_png, a##_png_len
 
@@ -28,9 +28,10 @@ struct Layout
 
 struct Icon
 {//
-	unsigned char* data;
-	unsigned int data_len;
-	unsigned texture_id;
+	unsigned char* data = nullptr;
+	unsigned int data_len = 0;
+	ALLEGRO_BITMAP* allegro_bitmap = nullptr;
+	int width = 0, height = 0;
 };
 
 struct Button
@@ -52,6 +53,10 @@ struct Button
 
 struct Context
 {//
+	bool running;
+	bool redraw;
+	int width, height;
+	float dpi, hdpi, vdpi;
 	int player_height;
 	int win_x;
 	int win_y;
@@ -60,7 +65,7 @@ struct Context
 	uint8_t mouse_buttons;
 	bool hot = false;
 	bool unfocus = false;
-	float frame_interval = 0.01;
+	double frame_interval = 0.01;
 	float prompt_fade = 0;
 	float prompt_target_fade = 0;
 	struct { int i0, j0, i1, j1; } prompt_rect = { 0, 0, 0, 0 } ;
@@ -72,49 +77,20 @@ struct Context
 #endif
 };
 
-class Editor
-{//
-public:
-	Editor (const std::string&);
-	~Editor();
-	void draw_frame() {}
-	void loop_step();
-	void update (double) {}
-	void resize() {}
-
-private:
-	void handle_mouse_move();
-
-	Button button_alert;
-	Button button_confirm;
-	Button button_input;
-	Button button_share;
-	Button button_open_url;
-	Button button_exit;
-
-	Button button_visualization_options;
-	Button button_characters_dialog;
-	Button button_music;
-	Button button_stage;
-	Button button_notifications;
-	Button button_about;
-
-	std::string project_name;
-};
+class Editor;
 
 struct Resources
 {//
-	SDL_Window* window;
-	SDL_GLContext gl_context;
-	bool running;
-	int width, height;
-	Editor* editor;
-	float dpi, hdpi, vdpi;
-	FontCache* font_cache;
+	ALLEGRO_FONT* allegro_font = nullptr;
+	ALLEGRO_TIMER* allegro_timer = nullptr;
+	ALLEGRO_DISPLAY* allegro_display = nullptr;
+	ALLEGRO_EVENT_QUEUE* allegro_queue = nullptr;
+	Editor* editor = nullptr;
+	bool init = false;
 };
 
 void loop_step();
-void set_window_size();
+void set_window_size (int, int);
 void layout_start (Layout::Type, int x, int y);
 bool do_button (Button&, int x, int y);
 bool do_button (Button&);

@@ -1,114 +1,92 @@
 #include "imgui.h"
-#include <SOIL2.h>
-#include "text.h"
-#include "../imgui/GL.h"
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_memfile.h>
+#include "Editor.h"
 
 extern petipa::imgui::Resources res;
-petipa::imgui::Context ctx;
+extern petipa::imgui::Context ctx;
 
-void handle_sdl_events()
+void handle_allegro_events()
 {
-	SDL_Event event;
-	while (SDL_PollEvent (&event)) {
+	ALLEGRO_EVENT event;
+	al_wait_for_event (res.allegro_queue, &event);
 
-		switch (event.type) {
-			case SDL_WINDOWEVENT:
-				switch (event.window.event) {
-					case SDL_WINDOWEVENT_RESIZED:
-						petipa::imgui::set_window_size();
-						break;
-				}
-				break;
-
-			case SDL_MOUSEMOTION:
-				ctx.win_x = ctx.ctrl_x = event.motion.x;
-				ctx.win_y = ctx.ctrl_y = event.motion.y;
-				ctx.hot_button = nullptr;
-				break;
-
-			case SDL_MOUSEBUTTONDOWN:
-				ctx.mouse_buttons |= SDL_BUTTON(event.button.button);
-				break;
-
-			case SDL_MOUSEBUTTONUP:
-				ctx.mouse_buttons &= ~SDL_BUTTON(event.button.button);
-				break;
-
-			case SDL_QUIT:
-				res.running = false;
-				break;
-
-#ifdef __APPLE__
-			case SDL_KEYDOWN:
-			case SDL_KEYUP:
-				ctx.control_mod = (event.key.keysym.mod & KMOD_LCTRL);
-				break;
-#endif
-			default:
-				break;
-		}
+	switch (event.type) {
+		case ALLEGRO_EVENT_TIMER:
+			ctx.redraw = true;
+			break;
+		case ALLEGRO_EVENT_KEY_DOWN:
+			switch (event.keyboard.keycode) {
+				case ALLEGRO_KEY_C:
+					break;
+				case ALLEGRO_KEY_UP:
+					break;
+				case ALLEGRO_KEY_DOWN:
+					break;
+				case ALLEGRO_KEY_Q:
+				case ALLEGRO_KEY_ESCAPE:
+					ctx.running = false;
+					break;
+				default:
+					break;
+			}
+			break;
+		case ALLEGRO_EVENT_DISPLAY_CLOSE:
+			ctx.running = false;
+			break;
+		case ALLEGRO_EVENT_DISPLAY_RESIZE:
+			petipa::imgui::set_window_size (event.display.width, event.display.height);
+			ctx.redraw = true;
+			break;
+		case ALLEGRO_EVENT_MOUSE_AXES:
+			ctx.win_x = ctx.ctrl_x = event.mouse.x;
+			ctx.win_y = ctx.ctrl_y = event.mouse.y;
+			ctx.hot_button = nullptr;
+			break;
+#define BUTTON(X) (1 << ((X)-1))
+		case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+			ctx.mouse_buttons |= BUTTON(event.mouse.button);
+			break;
+		case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+			ctx.mouse_buttons &= ~BUTTON(event.mouse.button);
+			break;
+#undef BUTTON
+		default:
+			break;
 	}
 }
 
 void petipa::imgui::loop_step()
 {
-	static uint32_t last_tick = SDL_GetTicks();
+	handle_allegro_events();
 
-	uint32_t current_tick = SDL_GetTicks();
-	if (current_tick > last_tick) // also avoids wrap every 49 days
-		ctx.frame_interval = (current_tick - last_tick)/1000.0;
-	last_tick = current_tick;
+	if (ctx.redraw && al_is_event_queue_empty (res.allegro_queue))
+	{
+		static double last_tick = al_get_time();
 
-	//FIXME retina hack
-#ifdef __APPLE__
-	double m = 2;
-#else
-	double m = 1;
-#endif
-
-	// If window is visible... //TODO: wait for show event
-	if (SDL_GetWindowFlags (res.window) | SDL_WINDOW_SHOWN) {
-
-		res.editor->update (ctx.frame_interval);
-
-		glViewport (0, 0, m*res.width, m*res.height);
-		glMatrixMode (GL_PROJECTION);
-
-		// Render scene.
-		glClear (GL_COLOR_BUFFER_BIT);
-		res.editor->draw_frame();
-
-		// Prepare to render UI elements.
-		glViewport (0, 0, m*res.width, m*res.height);
-		glLoadIdentity();
-		gluOrtho2D (0, res.width, res.height, 0);
+		double current_tick = al_get_time();
+		if (current_tick > last_tick) // also avoids wrap every 49 days
+			ctx.frame_interval = (current_tick - last_tick);
+		last_tick = current_tick;
 
 		if (!ctx.unfocus) {
 			ctx.hot = false;
 			res.editor->loop_step();
 		}
-
-		// Present new frame.
-		SDL_GL_SwapWindow (res.window);
+		res.editor->update (ctx.frame_interval);
+		res.editor->draw_frame();
+		al_flip_display();
+		ctx.redraw = false;
 	}
-
-	handle_sdl_events();
 }
 
-void petipa::imgui::set_window_size()
+void petipa::imgui::set_window_size (int width, int height)
 {
-	SDL_GetWindowSize (res.window, &res.width, &res.height);
-	ctx.player_height = res.height/8;
-	if (SDL_GetDisplayDPI (
-				SDL_GetWindowDisplayIndex (res.window),
-				&res.dpi,
-				&res.hdpi,
-				&res.vdpi
-		) != 0)
-	{
-		fprintf (stderr, "Couldn't get display DPI: %s\n", SDL_GetError());
-	}
-
+	ctx.width  = width;
+	ctx.height = height;
+	ctx.player_height = ctx.height/8;
+	ctx.dpi = ctx.hdpi = ctx.vdpi = al_get_monitor_dpi (ALLEGRO_DEFAULT_DISPLAY_ADAPTER);
 	res.editor->resize();
 }
 
@@ -125,31 +103,29 @@ petipa::imgui::Button::Button (int w_, int h_,
 static void render_button (petipa::imgui::Button& b, int x, int y)
 {
 	float alpha = (ctx.active_button == &b) ? 1 : (ctx.hot_button == &b) ? .8 : .6;
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	if (b.icons[0].data) { // has textures
+	if (b.icons[0].data) { // has bitmaps
 
 		if (!b.tried_to_load_texture) {
-			// load textures
-			for (int i = 0; b.icons[i].data; ++i)
-				b.icons[i].texture_id = SOIL_load_OGL_texture_from_memory(
-						b.icons[i].data,
-						b.icons[i].data_len,
-						SOIL_LOAD_AUTO,
-						SOIL_CREATE_NEW_ID,
-						SOIL_FLAG_MIPMAPS | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
-						//SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_COMPRESS_TO_DXT
-				);
+			// load bitmaps
+			for (int i = 0; b.icons[i].data; ++i) {
+				ALLEGRO_FILE* file = al_open_memfile (b.icons[i].data, b.icons[i].data_len, "r");
+				ALLEGRO_ASSERT (file != nullptr);
+				b.icons[i].allegro_bitmap = al_load_bitmap_f (file, ".png");
+				b.icons[i].width  = al_get_bitmap_width  (b.icons[i].allegro_bitmap);
+				b.icons[i].height = al_get_bitmap_height (b.icons[i].allegro_bitmap);
+				al_fclose (file);
+			}
 			b.tried_to_load_texture = true;
 		}
 
-		// apply texture
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, b.icons[b.state].texture_id);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-		glColor4f (1, 1, 1, alpha);
+		auto& icon = b.icons[b.state];
+		al_draw_scaled_bitmap (icon.allegro_bitmap,
+				0, 0, icon.width, icon.height,
+				x, y, b.w, b.h,
+				0);
 	}
+	/*
 	else { // no textures
 
 		float state_colors[][3] = { {1.,1.,1.}, {0x77/255.,0x66/255.,1.}, {.4,.4,1.}, {1.,.4,.4} };
@@ -175,6 +151,7 @@ static void render_button (petipa::imgui::Button& b, int x, int y)
 		glColor4f (0, 0, 0, 1);
 		petipa::imgui::render_text (res.font_cache, x+4, y+4, b.w-8, b.h-8, b.label.c_str());
 	}
+	*/
 }
 
 bool petipa::imgui::do_button (petipa::imgui::Button& b, int x, int y)
