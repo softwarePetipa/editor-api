@@ -31,6 +31,11 @@ static bool init_allegro()
 		ALLEGRO_ASSERT (res.allegro_display != nullptr);
 	}
 
+	if (res.allegro_timer == nullptr) {
+		res.allegro_timer = al_create_timer(1.0 / 30.0);
+		ALLEGRO_ASSERT (res.allegro_timer != nullptr);
+	}
+
 	if (res.allegro_queue == nullptr) {
 		res.allegro_queue = al_create_event_queue();
 		ALLEGRO_ASSERT (res.allegro_queue != nullptr);
@@ -66,9 +71,11 @@ bool petipa::imgui::run (const std::string& project_name, void*)
 	if (!init_allegro())
 		return false;
 
+	al_start_timer (res.allegro_timer);
 	while (ctx.running) {
 		petipa::imgui::loop_step();
 	}
+	al_stop_timer (res.allegro_timer);
 
 	al_destroy_font (res.allegro_font);
 	res.allegro_font = nullptr;
