@@ -19,12 +19,14 @@ else()
 	set (WANT_TESTS OFF)
 	set (WANT_EXAMPLES OFF)
 	set (WANT_POPUP_EXAMPLES OFF)
+	set (SHARED OFF)
 	FetchContent_Declare (allegro
 		GIT_REPOSITORY https://github.com/liballeg/allegro5
 		GIT_TAG 5.2.6)
 	FetchContent_MakeAvailable (allegro)
 	set (ALLEGRO_INCLUDE_DIRS
 		"${allegro_SOURCE_DIR}/include"
+		"${allegro_BINARY_DIR}/include"
 		"${allegro_SOURCE_DIR}/addons/font"
 		"${allegro_SOURCE_DIR}/addons/image"
 		"${allegro_SOURCE_DIR}/addons/memfile"
@@ -34,17 +36,15 @@ endif()
 target_link_libraries (petipa_lib ${ALLEGRO_LIBRARIES})
 target_include_directories (petipa_lib PRIVATE ${ALLEGRO_INCLUDE_DIRS})
 target_link_directories (petipa_lib PRIVATE ${ALLEGRO_LIBRARY_DIRS})
-target_link_options (petipa_lib PRIVATE -lallegro_main)
+target_link_options (petipa_lib PRIVATE -lallegro_main -lallegro_primitives)
 
 target_include_directories (petipa_lib PRIVATE
 	include
 	${ALLEGRO_INCLUDE_DIRS}
 )
 
-target_link_libraries (petipa_lib ${ALLEGRO_LIBRARIES})
-
-#get_cmake_property(_variableNames VARIABLES)
-#list (SORT _variableNames)
-#foreach (_variableName ${_variableNames})
-#	message (STATUS "${_variableName}=${${_variableName}}")
-#endforeach()
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+	message (STATUS "${_variableName}=${${_variableName}}")
+endforeach()
