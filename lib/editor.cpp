@@ -63,6 +63,26 @@ void ed::init()
 	};
 }
 
+double ed::get_minimum_line_width()
+{
+	return 1.;
+}
+
+double ed::get_maximum_line_width()
+{
+	return 20.;
+}
+
+double ed::get_minimum_fade_time()
+{
+	return .5;
+}
+
+double ed::get_maximum_fade_time()
+{
+	return 30.;
+}
+
 void ed::cancel_characters_and_tags_changes()
 {
 	//TODO: undo changes
