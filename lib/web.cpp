@@ -19,4 +19,7 @@ std::vector<web::StockMusic> web::get_stock_music_list()
 	return rc;
 }
 
-std::string download_stock_music (const std::string& title, const std::string& output_dir);
+std::string download_stock_music (const std::string& title, const std::string& output_dir)
+{
+	return "";
+}
