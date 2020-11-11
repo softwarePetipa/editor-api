@@ -2,6 +2,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_memfile.h>
+#include <allegro5/allegro_primitives.h>
 #include "Editor.h"
 
 extern petipa::imgui::Resources res;
@@ -60,6 +61,7 @@ void handle_allegro_events()
 void petipa::imgui::loop_step()
 {
 	handle_allegro_events();
+	al_clear_to_color (al_map_rgb(0,0,0));
 
 	if (ctx.redraw && al_is_event_queue_empty (res.allegro_queue))
 	{
@@ -102,7 +104,7 @@ petipa::imgui::Button::Button (int w_, int h_,
 
 static void render_button (petipa::imgui::Button& b, int x, int y)
 {
-	float alpha = (ctx.active_button == &b) ? 1 : (ctx.hot_button == &b) ? .8 : .6;
+	auto white = al_map_rgb (0xff, 0xff, 0xff);
 
 	if (b.icons[0].data) { // has bitmaps
 
@@ -125,33 +127,13 @@ static void render_button (petipa::imgui::Button& b, int x, int y)
 				x, y, b.w, b.h,
 				0);
 	}
-	/*
-	else { // no textures
-
-		float state_colors[][3] = { {1.,1.,1.}, {0x77/255.,0x66/255.,1.}, {.4,.4,1.}, {1.,.4,.4} };
-		float* color = state_colors[b.state];
-		glColor4f (color[0], color[1], color[2], alpha);
+	else { // no bitmap
+		al_draw_rectangle (x, y, x+b.w, y+b.h, white, 1);
 	}
-
-	// draw rectangle
-	glBegin(GL_POLYGON);
-		glTexCoord2f(0, 0);  glVertex2f(x, y);
-		glTexCoord2f(1, 0);  glVertex2f(x+b.w-1, y);
-		glTexCoord2f(1, 1);  glVertex2f(x+b.w-1, y+b.h-1);
-		glTexCoord2f(0, 1);  glVertex2f(x, y+b.h-1);
-	glEnd();
-
-	// finalize OpenGL state
-	glDisable(GL_BLEND);
-	if (b.icons[0].data)
-		glDisable(GL_TEXTURE_2D);
 
 	// draw text label
-	if (!b.label.empty()) {
-		glColor4f (0, 0, 0, 1);
-		petipa::imgui::render_text (res.font_cache, x+4, y+4, b.w-8, b.h-8, b.label.c_str());
-	}
-	*/
+	if (!b.label.empty())
+		al_draw_text (res.allegro_font, al_map_rgb(0xff,0xff,0xff), x+b.w/2, y+b.h/2, ALLEGRO_ALIGN_CENTRE, b.label.c_str());
 }
 
 bool petipa::imgui::do_button (petipa::imgui::Button& b, int x, int y)
